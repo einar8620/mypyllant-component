@@ -18,7 +18,18 @@ from myPyllant import export, report
 
 from myPyllant.api import MyPyllantAPI
 from myPyllant.const import DEFAULT_BRAND
-from myPyllant.enums import DeviceDataBucketResolution
+from myPyllant.enums import DeviceDataBucketResolution, EnergyManagerState
+
+# myPyllant 0.9.10 is missing the COOLING state — patch it in so the
+# energy_manager_state sensor works correctly when the heat pump is cooling.
+if "COOLING" not in EnergyManagerState.__members__:
+    new_member = object.__new__(EnergyManagerState)
+    new_member._name_ = "COOLING"
+    new_member._value_ = "COOLING"
+    EnergyManagerState._value2member_map_["COOLING"] = new_member
+    EnergyManagerState._member_map_["COOLING"] = new_member
+    EnergyManagerState._member_names_.append("COOLING")
+
 from myPyllant.http_client import (
     AuthenticationFailed,
     RealmInvalid,
